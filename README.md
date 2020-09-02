@@ -82,7 +82,7 @@ s3api =
 
 You can now upload your data to OSN with a command line argument like the following
 ```
-$ s3 --profile osn cp /local/path s3://Pangeo/ocean-eddy-cpt/<dataset name>
+$ aws s3 --profile osn cp /local/path s3://Pangeo/ocean-eddy-cpt/<dataset name>
 ```
 Where `<dataset name>` is a unique identifier for your dataset.
 It can contain `/` characters in order to organize the data in to sub-directories.
