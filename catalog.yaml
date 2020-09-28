@@ -3,3 +3,15 @@ plugins:
     - module: intake_xarray
 
 sources:
+
+  neverworld_five_day_averages:
+    description: Five-day-average fields from Neverworld
+    driver: zarr
+    args:
+      urlpath: s3://Pangeo/ocean-eddy-cpt/5-day-averages/
+      consolidated: True
+      storage_options:
+        key: 'JJ32C62DGTQNWF4H0Y6W'
+        secret: 'yK2GdsCUgLspj6lrAHkdtvsC1qc8HW0PB7P3Ybs9'
+        client_kwargs:
+          endpoint_url: 'https://ncsa.osn.xsede.org'
