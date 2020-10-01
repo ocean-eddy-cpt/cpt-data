@@ -11,7 +11,7 @@ sources:
       urlpath: s3://Pangeo/ocean-eddy-cpt/5-day-averages/
       consolidated: True
       storage_options:
-        key: 'JJ32C62DGTQNWF4H0Y6W'
-        secret: 'yK2GdsCUgLspj6lrAHkdtvsC1qc8HW0PB7P3Ybs9'
+        key: 'EL456I5ZRYB44RB6J7Q4'
+        secret: 'QydNAjMWBTOLRjHiA36uMvhBvI4WeTxWYNJ5oaiP'
         client_kwargs:
           endpoint_url: 'https://ncsa.osn.xsede.org'
