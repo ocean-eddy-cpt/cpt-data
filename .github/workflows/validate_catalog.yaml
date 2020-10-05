@@ -1,6 +1,6 @@
 name: Validate Catalog
 
-on: [push, pr]
+on: [push, pull_request]
 
 jobs:
   validate-catalog:
