@@ -63,6 +63,25 @@ Chunking in space can also be used for very high-resolution datasets.
 When this step is complete, you will have one or more Zarr stores on disk.
 _Note that Zarr also makes an excellent on-disk analysis-ready format. Many users prefer to transform all their NetCDF data to Zarr, even if not using the cloud._
 
+#### Workaround for Date Issue
+
+We found that some of the netCDF files from the NeverWorld MOM6 output had problems with the time
+metadata that caused problems with xarray. 
+These problems are documented in a [MOM6 GitHub Issue](https://github.com/NOAA-GFDL/MOM6/issues/1203).
+Until this is resolved within MOM6, the following workaround can be used when opening the netCDF files:
+
+```python
+ds = xr.open_mfdataset('*.nc', decode_times=False)
+for var in ds.variables:
+    # fix wrong calendar encoding
+    if ds[var].attrs.get('calendar') == 'THIRTY_DAY_MONTHS':
+        ds[var].attrs['calendar'] = '360_day'
+    # fix missing calendar encoding
+    elif ds[var].dims == ('time',) and ds[var].attrs.get('units', '').startswith('days'):
+        ds[var].attrs['calendar'] = '360_day'
+ds = xr.decode_cf(ds) 
+```
+
 ### Step 2: Upload to OSN
 
 For this step, we will use the [AWS s3 command line utility](https://docs.aws.amazon.com/cli/latest/reference/s3/).
