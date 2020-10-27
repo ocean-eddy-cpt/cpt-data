@@ -67,10 +67,17 @@ _Note that Zarr also makes an excellent on-disk analysis-ready format. Many user
 
 For this step, we will use the [AWS s3 command line utility](https://docs.aws.amazon.com/cli/latest/reference/s3/).
 First, you will have to [install the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html).
-Then create a configuration profile for OSN.
+Then you need to install this pip package:
+```
+$ pip install awscli-plugin-endpoint
+```
+Then enable the plugin and create a configuration profile for OSN.
 You do this by editing the file `$HOME/.aws/config` and adding a section as follows:
 
 ```
+[plugins]
+endpoint = awscli_plugin_endpoint
+
 [profile osn]
 aws_access_key_id=<email Ryan for secrets>
 aws_secret_access_key=<email Ryan for secrets>
@@ -82,7 +89,7 @@ s3api =
 
 You can now upload your data to OSN with a command line argument like the following
 ```
-$ aws s3 --profile osn cp /local/path s3://Pangeo/ocean-eddy-cpt/<dataset name>
+$ aws s3 --profile osn cp --recursive /local/path s3://Pangeo/ocean-eddy-cpt/<dataset name>
 ```
 Where `<dataset name>` is a unique identifier for your dataset.
 It can contain `/` characters in order to organize the data in to sub-directories.
@@ -93,9 +100,14 @@ That means that, if you have the read-write credentials, you can potentially del
 Please be very careful!
 
 
-### Step 3: Verify your upload (open from python)
+### Step 3: Verify your upload
 
-Now we check that our uploaded data is readable.
+First we check that the files are there using the CLI:
+```
+$ aws s3 --profile osn ls --recursive /local/path s3://Pangeo/ocean-eddy-cpt/
+```
+
+Next we check that our uploaded data is readable from python.
 For this we need to have the following python packages installed.
 - [s3fs](https://github.com/dask/s3fs)
 - [Zarr](https://zarr.readthedocs.io/en/latest/)
