@@ -11,6 +11,6 @@ jobs:
       with:
         python-version: '3.8'
     - name: Install Dependencies
-      run: pip install intake intake-xarray s3fs xarray zarr
+      run: pip install intake intake-xarray jinja2 s3fs xarray zarr
     - name: Check Catalog Entries
       run: python validate_catalog.py
