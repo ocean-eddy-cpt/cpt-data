@@ -63,14 +63,40 @@ Chunking in space can also be used for very high-resolution datasets.
 When this step is complete, you will have one or more Zarr stores on disk.
 _Note that Zarr also makes an excellent on-disk analysis-ready format. Many users prefer to transform all their NetCDF data to Zarr, even if not using the cloud._
 
+#### Workaround for Date Issue
+
+We found that some of the netCDF files from the NeverWorld MOM6 output had problems with the time
+metadata that caused problems with xarray. 
+These problems are documented in a [MOM6 GitHub Issue](https://github.com/NOAA-GFDL/MOM6/issues/1203).
+Until this is resolved within MOM6, the following workaround can be used when opening the netCDF files:
+
+```python
+ds = xr.open_mfdataset('*.nc', decode_times=False)
+for var in ds.variables:
+    # fix wrong calendar encoding
+    if ds[var].attrs.get('calendar') == 'THIRTY_DAY_MONTHS':
+        ds[var].attrs['calendar'] = '360_day'
+    # fix missing calendar encoding
+    elif ds[var].dims == ('time',) and ds[var].attrs.get('units', '').startswith('days'):
+        ds[var].attrs['calendar'] = '360_day'
+ds = xr.decode_cf(ds) 
+```
+
 ### Step 2: Upload to OSN
 
 For this step, we will use the [AWS s3 command line utility](https://docs.aws.amazon.com/cli/latest/reference/s3/).
 First, you will have to [install the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html).
-Then create a configuration profile for OSN.
+Then you need to install this pip package:
+```
+$ pip install awscli-plugin-endpoint
+```
+Then enable the plugin and create a configuration profile for OSN.
 You do this by editing the file `$HOME/.aws/config` and adding a section as follows:
 
 ```
+[plugins]
+endpoint = awscli_plugin_endpoint
+
 [profile osn]
 aws_access_key_id=<email Ryan for secrets>
 aws_secret_access_key=<email Ryan for secrets>
@@ -82,7 +108,7 @@ s3api =
 
 You can now upload your data to OSN with a command line argument like the following
 ```
-$ s3 --profile osn cp /local/path s3://Pangeo/ocean-eddy-cpt/<dataset name>
+$ aws s3 --profile osn cp --recursive /local/path s3://Pangeo/ocean-eddy-cpt/<dataset name>
 ```
 Where `<dataset name>` is a unique identifier for your dataset.
 It can contain `/` characters in order to organize the data in to sub-directories.
@@ -93,9 +119,14 @@ That means that, if you have the read-write credentials, you can potentially del
 Please be very careful!
 
 
-### Step 3: Verify your upload (open from python)
+### Step 3: Verify your upload
 
-Now we check that our uploaded data is readable.
+First we check that the files are there using the CLI:
+```
+$ aws s3 --profile osn ls --recursive /local/path s3://Pangeo/ocean-eddy-cpt/
+```
+
+Next we check that our uploaded data is readable from python.
 For this we need to have the following python packages installed.
 - [s3fs](https://github.com/dask/s3fs)
 - [Zarr](https://zarr.readthedocs.io/en/latest/)
