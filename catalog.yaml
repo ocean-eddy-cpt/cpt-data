@@ -58,7 +58,7 @@ sources:
         anon: True
         client_kwargs:
           endpoint_url: 'https://ncsa.osn.xsede.org'
-          
+
   neverworld_eighth_degree_snapshots:
     description: snapshots of fields from Neverworld2
     driver: zarr
@@ -146,4 +146,3 @@ sources:
         anon: True
         client_kwargs:
           endpoint_url: 'https://ncsa.osn.xsede.org'
-
